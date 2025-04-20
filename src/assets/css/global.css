@@ -1,0 +1,91 @@
+/* 全局样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: #0f1c38;
+  color: #ffffff;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+#app {
+  height: 100%;
+  width: 100%;
+}
+
+.data-container {
+  padding: 20px;
+}
+
+.chart-container {
+  background: rgba(13, 28, 59, 0.8);
+  border: 1px solid #1e3d7a;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.5);
+}
+
+.chart {
+  width: 100%;
+  height: 350px;
+}
+
+.page-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #4db3ff;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(77, 179, 255, 0.5);
+}
+
+.dashboard-card {
+  background: rgba(13, 28, 59, 0.8);
+  border: 1px solid #1e3d7a;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border-color: #4db3ff;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-primary {
+  color: #4db3ff;
+}
+
+/* 自定义Element Plus样式 */
+.el-button--primary {
+  background-color: #1e3d7a;
+  border-color: #1e3d7a;
+}
+
+.el-button--primary:hover {
+  background-color: #2c5ba5;
+  border-color: #2c5ba5;
+}
+
+.el-input__inner {
+  background-color: rgba(30, 61, 122, 0.3);
+  border-color: #1e3d7a;
+  color: #ffffff;
+}
+
+.el-form-item__label {
+  color: #ffffff;
+} 
