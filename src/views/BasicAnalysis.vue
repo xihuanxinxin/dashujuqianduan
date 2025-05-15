@@ -9,11 +9,7 @@
           分析数据
         </el-button>
       </el-form-item>
-      <el-form-item>
-        <el-button @click="resetData">
-          重置数据
-        </el-button>
-      </el-form-item>
+
     </el-form>
     
     <!-- 图表展示区域 -->
@@ -113,22 +109,72 @@ const fetchData = async () => {
     
     console.log('后端返回数据:', response) // 添加日志查看返回数据
     
-    // 延迟更新图表数据，确保DOM已完全渲染
-    setTimeout(() => {
-      // 确保响应数据存在并且有效
+    // 处理获取到的数据
       if (response && response.data) {
-        // 逐个更新图表数据，避免一次性更新过多数据导致渲染问题
-        setTimeout(() => {
+      // 更新评分分布数据
           chartData.rating_distribution = response.data.rating_distribution || {}
-        }, 100)
         
-        setTimeout(() => {
-          chartData.genre_distribution = response.data.genre_distribution || {}
-        }, 200)
+      // 处理类型分布数据
+          const genre = response.data.genre_distribution || {}
+          if (genre.xAxis && genre.series && genre.series[0] && Array.isArray(genre.xAxis.data) && Array.isArray(genre.series[0].data)) {
+            chartData.genre_distribution = {
+              title: { text: '电影类型分布', left: 'center' },
+              tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+          legend: { show: false },
+              series: [
+                {
+                  name: '电影类型',
+                  type: 'pie',
+                  radius: ['40%', '70%'],
+                  avoidLabelOverlap: false,
+                  itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#0d1c3b',
+                    borderWidth: 2
+                  },
+              label: { show: true, color: '#fff' },
+                  emphasis: {
+                    label: { show: true, fontSize: '18', fontWeight: 'bold' }
+                  },
+              labelLine: { show: true },
+                  data: genre.xAxis.data.map((name, idx) => ({ name, value: genre.series[0].data[idx] }))
+                }
+              ]
+            }
+          } else {
+            chartData.genre_distribution = genre
+          }
         
-        setTimeout(() => {
-          chartData.runtime_distribution = response.data.runtime_distribution || {}
-        }, 300)
+      // 处理时长分布数据
+          const runtime = response.data.runtime_distribution || {}
+          if (runtime.xAxis && runtime.series && runtime.series[0] && Array.isArray(runtime.xAxis.data) && Array.isArray(runtime.series[0].data)) {
+            chartData.runtime_distribution = {
+              title: { text: '电影时长分布', left: 'center' },
+              tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+          legend: { show: false },
+              series: [
+                {
+                  name: '时长区间',
+                  type: 'pie',
+                  radius: ['40%', '70%'],
+                  avoidLabelOverlap: false,
+                  itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#0d1c3b',
+                    borderWidth: 2
+                  },
+              label: { show: true, color: '#fff' },
+                  emphasis: {
+                    label: { show: true, fontSize: '18', fontWeight: 'bold' }
+                  },
+              labelLine: { show: true },
+                  data: runtime.xAxis.data.map((name, idx) => ({ name, value: runtime.series[0].data[idx] }))
+                }
+              ]
+            }
+          } else {
+            chartData.runtime_distribution = runtime
+          }
         
         // 如果后端返回了原始数据，则更新表格，但是限制数据量
         if (response.data.original_data) {
@@ -138,17 +184,13 @@ const fetchData = async () => {
       } else {
         ElMessage.warning('未获取到有效的分析数据')
       }
-    }, 500) // 延迟500ms确保DOM已渲染完成
-    
   } catch (error) {
     console.error('获取数据失败:', error)
     // 显示错误提示
     ElMessage.error('获取数据失败，请重试')
   } finally {
-    // 延迟关闭loading状态，确保用户能看到加载中的提示
-    setTimeout(() => {
+    // 关闭loading状态
       loading.value = false
-    }, 800)
   }
 }
 
@@ -205,5 +247,9 @@ onMounted(() => {
 
 :deep(.el-table__body tr.hover-row > td) {
   background-color: rgba(77, 179, 255, 0.1) !important;
+}
+
+:deep(.echarts-pager), :deep(.echarts-pager-content) {
+  display: none !important;
 }
 </style> 

@@ -9,25 +9,8 @@
           分析数据
         </el-button>
       </el-form-item>
-      <el-form-item>
-        <el-button @click="resetData">
-          重置数据
-        </el-button>
-      </el-form-item>
-      <el-form-item label="模型选择">
-        <el-select v-model="modelType" @change="fetchData">
-          <el-option label="随机森林" value="random_forest"></el-option>
-          <el-option label="梯度提升树" value="gradient_boosting"></el-option>
-          <el-option label="深度学习" value="deep_learning"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="目标变量">
-        <el-select v-model="targetVariable" @change="fetchData">
-          <el-option label="评分(IMDb)" value="imdb_rating"></el-option>
-          <el-option label="票房" value="box_office"></el-option>
-          <el-option label="奖项数" value="awards"></el-option>
-        </el-select>
-      </el-form-item>
+
+      
     </el-form>
     
     <!-- 特征重要性图表 -->

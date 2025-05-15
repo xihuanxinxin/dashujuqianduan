@@ -9,26 +9,9 @@
           分析数据
         </el-button>
       </el-form-item>
-      <el-form-item>
-        <el-button @click="resetData">
-          重置数据
-        </el-button>
-      </el-form-item>
-      <el-form-item label="聚类数量">
-        <el-select v-model="clusterCount" @change="fetchData">
-          <el-option label="2" :value="2"></el-option>
-          <el-option label="3" :value="3"></el-option>
-          <el-option label="4" :value="4"></el-option>
-          <el-option label="5" :value="5"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="特征组合">
-        <el-select v-model="featureCombination" @change="fetchData">
-          <el-option label="时长 vs 评分" value="runtime_rating"></el-option>
-          <el-option label="年份 vs 评分" value="year_rating"></el-option>
-          <el-option label="时长 vs 年份" value="runtime_year"></el-option>
-        </el-select>
-      </el-form-item>
+
+
+
     </el-form>
     
     <!-- 聚类分析图表 -->
@@ -69,15 +52,7 @@
         </div>
       </el-col>
       <el-col :xs="24" :lg="12">
-        <div class="chart-container">
-          <ChartComponent
-            chart-id="cluster-centers"
-            title="聚类中心特征"
-            :options="chartData.cluster_centers"
-            :loading="loading"
-            :height="350"
-          />
-        </div>
+        
       </el-col>
     </el-row>
     

@@ -44,6 +44,11 @@ export default {
     return api.get('/api/analysis/rating', { params })
   },
   
+  // 评分与时长热力图接口
+  getRatingRuntimeHeatmap(params = {}) {
+    return api.get('/api/analysis/rating-runtime-heatmap', { params })
+  },
+  
   // 时间序列分析接口
   getTimeSeriesAnalysis(params) {
     return api.get('/api/analysis/time-series', { params })
@@ -67,5 +72,15 @@ export default {
   // 单个电影预测分析接口
   predictMovie(movieData) {
     return api.post('/api/movie/predict', movieData)
+  },
+
+  // 获取电影总数接口
+  getMovieCount() {
+    return api.get('/api/analysis/count')
+  },
+
+  // 获取平均分接口
+  getAverageRating() {
+    return api.get('/api/analysis/average-rating')
   }
 } 

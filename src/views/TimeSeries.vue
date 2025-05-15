@@ -9,19 +9,7 @@
           分析数据
         </el-button>
       </el-form-item>
-      <el-form-item>
-        <el-button @click="resetData">
-          重置数据
-        </el-button>
-      </el-form-item>
-      <el-form-item label="时间范围">
-        <el-select v-model="timeRange" @change="fetchData">
-          <el-option label="全部" value="all"></el-option>
-          <el-option label="最近5年" value="5"></el-option>
-          <el-option label="最近10年" value="10"></el-option>
-          <el-option label="最近20年" value="20"></el-option>
-        </el-select>
-      </el-form-item>
+    
     </el-form>
     
     <!-- 时间序列图表 -->

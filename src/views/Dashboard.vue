@@ -7,8 +7,7 @@
       <el-col :xs="24" :sm="12" :md="6">
         <DataCard 
           title="电影总数" 
-          value="5,890" 
-          sub-value="较上月增长 8.2%" 
+          :value="movieCount" 
           trend="up" 
           icon-bg-color="#4db3ff">
           <template #icon>
@@ -19,8 +18,7 @@
       <el-col :xs="24" :sm="12" :md="6">
         <DataCard 
           title="平均评分" 
-          value="7.6" 
-          sub-value="较上月增长 0.3" 
+          :value="averageRating" 
           trend="up" 
           icon-bg-color="#67c23a">
           <template #icon>
@@ -28,30 +26,8 @@
           </template>
         </DataCard>
       </el-col>
-      <el-col :xs="24" :sm="12" :md="6">
-        <DataCard 
-          title="分析任务" 
-          value="24" 
-          sub-value="较上月减少 2" 
-          trend="down" 
-          icon-bg-color="#e6a23c">
-          <template #icon>
-            <el-icon><DataAnalysis /></el-icon>
-          </template>
-        </DataCard>
-      </el-col>
-      <el-col :xs="24" :sm="12" :md="6">
-        <DataCard 
-          title="预测准确率" 
-          value="89.2%" 
-          sub-value="较上月增长 1.5%" 
-          trend="up" 
-          icon-bg-color="#f56c6c">
-          <template #icon>
-            <el-icon><DataLine /></el-icon>
-          </template>
-        </DataCard>
-      </el-col>
+      
+      
     </el-row>
     
     <!-- 分析模块导航 -->
@@ -72,7 +48,7 @@
     <h2 class="dashboard-subtitle">数据概览</h2>
     <el-row :gutter="20">
       <el-col :xs="24" :lg="12">
-        <div class="chart-container">
+        <div class="chart-container genre-overview-up">
           <ChartComponent
             chart-id="genre-overview"
             title="类型分布概览"
@@ -85,7 +61,7 @@
         <div class="chart-container">
           <ChartComponent
             chart-id="rating-overview"
-            title="评分趋势概览"
+            title="评分分布概览"
             :options="ratingTrendOptions"
             :height="350"
           />
@@ -126,6 +102,8 @@ const router = useRouter()
 
 // 页面状态
 const loading = ref(false)
+const movieCount = ref('5,890')
+const averageRating = ref('7.6')
 
 // 分析模块数据
 const analysisModules = [
@@ -183,21 +161,22 @@ const analysisModules = [
 // 图表数据配置
 const genreDistributionOptions = reactive({
   title: {
-    text: '类型分布概览',
+    
     left: 'center'
   },
   tooltip: {
     trigger: 'item',
-    formatter: '{a} <br/>{b}: {c} ({d}%)'
+    formatter: '{b}: {c} ({d}%)'
   },
   legend: {
-    top: 'bottom'
+    show: false
   },
   series: [
     {
       name: '电影类型',
       type: 'pie',
       radius: ['40%', '70%'],
+      center: ['50%', '42%'],
       avoidLabelOverlap: false,
       itemStyle: {
         borderRadius: 10,
@@ -225,41 +204,39 @@ const genreDistributionOptions = reactive({
 
 const ratingTrendOptions = reactive({
   title: {
-    text: '评分趋势概览',
+
     left: 'center'
   },
   tooltip: {
     trigger: 'axis'
   },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '15%',
+    containLabel: true
+  },
   xAxis: {
     type: 'category',
-    data: []
+    data: [],
+    name: '评分'
   },
   yAxis: {
     type: 'value',
-    name: '平均评分',
-    min: 7,
-    max: 8
+    name: '电影数量'
   },
   series: [
     {
-      name: '平均评分',
-      type: 'line',
-      data: [],
-      smooth: true,
-      markPoint: {
-        data: [
-          { type: 'max', name: '最大值' },
-          { type: 'min', name: '最小值' }
-        ]
-      }
+      name: '电影数量',
+      type: 'bar',
+      data: []
     }
   ]
 })
 
 const yearlyMovieCountOptions = reactive({
   title: {
-    text: '年度电影数量统计',
+    
     left: 'center'
   },
   tooltip: {
@@ -314,15 +291,40 @@ const navigateTo = (path) => {
 const fetchDashboardData = async () => {
   loading.value = true
   try {
+    // 获取电影总数
+    try {
+      const countResponse = await api.getMovieCount()
+      if (countResponse && countResponse.data) {
+        // 更新电影总数卡片的值
+        movieCount.value = countResponse.data.total_count.toLocaleString()
+      }
+    } catch (countError) {
+      console.error('获取电影总数失败:', countError)
+    }
+
+    // 获取平均分
+    try {
+      const ratingResponse = await api.getAverageRating()
+      if (ratingResponse && ratingResponse.data) {
+        // 更新平均分卡片的值，保留一位小数
+        averageRating.value = Number(ratingResponse.data.average_rating).toFixed(1)
+      }
+    } catch (ratingError) {
+      console.error('获取平均分失败:', ratingError)
+    }
+
     // 调用基础分析API获取类型分布数据
     const response = await api.getBasicAnalysis()
     
     if (response && response.data) {
       // 更新类型分布数据
-      if (response.data.genre_distribution && 
-          response.data.genre_distribution.series && 
-          response.data.genre_distribution.series[0].data) {
-        genreDistributionOptions.series[0].data = response.data.genre_distribution.series[0].data
+      if (response.data.genre_distribution) {
+        const xData = response.data.genre_distribution.xAxis.data
+        const yData = response.data.genre_distribution.series[0].data
+        genreDistributionOptions.series[0].data = xData.map((name, idx) => ({
+          name,
+          value: yData[idx]
+        }))
       }
       
       // 获取年度数据 - 从时间序列API获取
@@ -330,12 +332,6 @@ const fetchDashboardData = async () => {
         const timeSeriesResponse = await api.getTimeSeriesAnalysis()
         
         if (timeSeriesResponse && timeSeriesResponse.data) {
-          // 更新年度评分趋势
-          if (timeSeriesResponse.data.yearly_rating_trend) {
-            ratingTrendOptions.xAxis.data = timeSeriesResponse.data.yearly_rating_trend.xAxis.data || []
-            ratingTrendOptions.series[0].data = timeSeriesResponse.data.yearly_rating_trend.series[0].data || []
-          }
-          
           // 更新年度电影数量
           if (timeSeriesResponse.data.yearly_movie_count) {
             yearlyMovieCountOptions.xAxis.data = timeSeriesResponse.data.yearly_movie_count.xAxis.data || []
@@ -344,6 +340,12 @@ const fetchDashboardData = async () => {
         }
       } catch (timeSeriesError) {
         console.error('获取时间序列数据失败:', timeSeriesError)
+      }
+
+      // 更新评分分布数据
+      if (response.data.rating_distribution) {
+        ratingTrendOptions.xAxis.data = response.data.rating_distribution.xAxis.data
+        ratingTrendOptions.series[0].data = response.data.rating_distribution.series[0].data
       }
     }
   } catch (error) {
@@ -419,5 +421,14 @@ onMounted(() => {
   .el-col {
     margin-bottom: 20px;
   }
+}
+
+.genre-overview-up {
+  padding-top: 6px;
+  margin-top: 0 !important;
+}
+
+:deep(.echarts-pager), :deep(.echarts-pager-content) {
+  display: none !important;
 }
 </style> 

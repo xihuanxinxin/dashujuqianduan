@@ -241,7 +241,10 @@ const submitForm = async () => {
     console.log('接收响应:', response)
     
     // 更新评分结果 - 根据后端返回结构进行适配
-    if (response.data && typeof response.data.score !== 'undefined') {
+    if (response.data && response.data.ensemble_prediction !== undefined) {
+      // 获取ensemble_prediction字段
+      predictedScore.value = response.data.ensemble_prediction
+    } else if (response.data && typeof response.data.score !== 'undefined') {
       // 直接获取score字段
       predictedScore.value = response.data.score
     } else if (response.score) {
